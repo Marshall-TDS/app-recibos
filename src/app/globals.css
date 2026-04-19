@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Legacy Tokens kept for non-tail-wind parts */
+    --color-primary: #dbaa3d;
+    --color-primary-dark: #b5831f;
+    --bg-primary: #121212;      
+    --bg-secondary: #1a1a1a;
+    --text-primary: #ffffff;    
+    --text-secondary: #a1a1aa;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(18, 18, 18, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: blur(24px);
+    --input-height: 54px;
+    --border-radius-md: 12px;
+
+    /* Tailwind v4 CSS variables for custom colors */
+    --color-marshall-gold: #dbaa3d;
+    --color-marshall-gold-dark: #b5831f;
+    --color-marshall-gold-light: #f4d189;
+  }
+
+  body {
+    @apply bg-[#121212] text-white antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-slate-900/85 backdrop-blur-3xl border border-white/10;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(219, 170, 61, 0.1);
+  }
+
+  .button-primary {
+    @apply h-[54px] bg-marshall-gold text-white rounded-xl font-bold px-6 flex items-center justify-center transition-all duration-200 hover:bg-marshall-gold-dark hover:-translate-y-0.5 hover:shadow-[0_10px_40px_rgba(219,170,61,0.25)];
+  }
+
+  .grid-bg {
+    background-image: radial-gradient(circle, rgba(219, 170, 61, 0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .orb {
+    @apply absolute rounded-full blur-[140px] opacity-25 pointer-events-none -z-10;
+  }
+
+  /* Custom Input Styling to match Nexus Standard */
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+    @apply h-[54px] px-4 rounded-xl border border-white/10 bg-white/[0.03] text-white transition-all outline-none focus:border-marshall-gold focus:bg-slate-900 focus:ring-4 focus:ring-marshall-gold/15;
+  }
+
+  textarea {
+    @apply h-auto min-h-[120px] py-4;
+  }
+}
+
+/* Mapping for Tailwind v4 custom themes if needed in CSS */
+@theme {
+  --color-marshall-gold: var(--color-marshall-gold);
+  --color-marshall-gold-dark: var(--color-marshall-gold-dark);
+  --color-marshall-gold-light: var(--color-marshall-gold-light);
+}

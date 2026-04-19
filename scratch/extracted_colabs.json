@@ -1,0 +1,80 @@
+[
+  {
+    "nome": "Douglas Lopes Aguiar",
+    "documento": "63.217.345/0001-11",
+    "cargo": "Desenvolvedor Full Stack",
+    "salario_base": 4000.0,
+    "gratificacao_padrao": 20,
+    "adicionais": [
+      {
+        "descricao": "Salário Base",
+        "valor_mensal": 4000.0
+      }
+    ],
+    "nome_empresa": "Black Swords LTDA"
+  },
+  {
+    "nome": "Tamires Moreira Frizanco",
+    "documento": "CNPJ/CPF:  444.618.778-33",
+    "cargo": "Recursos Humanos",
+    "salario_base": 6000.0,
+    "gratificacao_padrao": 20,
+    "adicionais": [
+      {
+        "descricao": "Salário Base",
+        "valor_mensal": 6000.0
+      }
+    ],
+    "nome_empresa": "Conect LTDA 59.584.517-0001/18 CARGO Recursos Humanos REFERÊNCIA Fev (até 20/02), Mar CÓD. DESCRIÇÃO REF. VENCIMENTOS DESCONTOS 001 Salário Base Mensal: R$ 6.000,00 R$ 10.000,00 002 Gratificação 20% do Salário R$ 2.000,00 901 Descontos Gerais - R$ 0,00 VALOR LÍQUIDO: R$ 12.000,00 Declaro ter recebido a importância líquida discriminada neste recibo, referente ao pagamento do período acima mencionado. Data: 20/03/2026 ASSINATURA DO COLABORADOR ASSINATURA DO EMPREGADOR Empregador:  Natan Portela da Silva"
+  },
+  {
+    "nome": "Thiago Lamberti",
+    "documento": "63.490.655/0001-05",
+    "cargo": "Chief Technology Officer",
+    "salario_base": 15000.0,
+    "gratificacao_padrao": 20,
+    "adicionais": [
+      {
+        "descricao": "Salário Base",
+        "valor_mensal": 15000.0
+      },
+      {
+        "descricao": "Convênio",
+        "valor_mensal": 3184.78
+      }
+    ],
+    "nome_empresa": "SURSUM ANIMA TECNOLOGIA E DESENVOLVIMENTO HUMANO LTDA"
+  },
+  {
+    "nome": "Felipe Quintino Torres",
+    "documento": "42.915.167/0001-22",
+    "cargo": "Product Owner",
+    "salario_base": 6500.0,
+    "gratificacao_padrao": 20,
+    "adicionais": [
+      {
+        "descricao": "Salário Base",
+        "valor_mensal": 6500.0
+      }
+    ],
+    "nome_empresa": "42.915.167 Felipe Quintino Torres"
+  },
+  {
+    "nome": "Gabriel Pereira",
+    "documento": "63.573.304/0001-68",
+    "cargo": "Chief Operating Officer",
+    "salario_base": 10000.0,
+    "gratificacao_padrao": 20,
+    "adicionais": [
+      {
+        "descricao": "Salário Base",
+        "valor_mensal": 10000.0
+      },
+      {
+        "descricao": "Convênio",
+        "valor_mensal": 2800.0
+      }
+    ],
+    "nome_empresa": "V.I.R.T.U.O.S LTDA"
+  }
+]
