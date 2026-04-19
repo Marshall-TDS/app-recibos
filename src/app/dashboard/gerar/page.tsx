@@ -322,7 +322,7 @@ export default function GerarReciboPage() {
 
       for (let i = 0; i < selectedPeople.length; i++) {
         const colab = selectedPeople[i];
-        setBatchProgress(prev => ({ ...prev, current: i + 1, status: `Processando: ${colab.nome} ${i > 0 ? `(Tentativas aplicadas se necessário)` : ''}` }));
+        setBatchProgress(prev => ({ ...prev, current: i + 1, status: `Processando: ${colab.nome}` }));
         
         try {
           const calcs = calculateTotals(colab);
@@ -747,38 +747,38 @@ export default function GerarReciboPage() {
                   <div className="absolute top-0 right-0 w-64 h-64 bg-marshall-gold/10 blur-[100px] pointer-events-none" />
                   
                   <div className="flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10">
-                    <div className="flex-1 space-y-8 text-center lg:text-left">
-                      <h2 className="text-xs font-black text-marshall-gold uppercase tracking-[5px]">Revisão de Lote</h2>
+                    <div className="flex-1 space-y-6 text-center lg:text-left">
+                      <h2 className="text-[10px] font-black text-marshall-gold uppercase tracking-[5px] opacity-70">Confirmação de Transmissão</h2>
                       
-                      <div className="space-y-3">
-                        <p className="text-4xl sm:text-6xl font-black italic tracking-tighter leading-tight uppercase">
-                          {selectedIds.length} {selectedIds.length === 1 ? 'Colaborador' : 'Colaboradores'}
+                      <div className="space-y-1">
+                        <p className="text-5xl sm:text-7xl font-black italic tracking-tighter leading-none uppercase">
+                          {selectedIds.length} <span className="text-zinc-800 not-italic block lg:inline text-3xl sm:text-5xl ml-2">{selectedIds.length === 1 ? 'Colaborador' : 'Colaboradores'}</span>
                         </p>
-                        <p className="text-zinc-500 font-bold uppercase tracking-widest text-sm italic">Referência: {getReferenciaTexto()}</p>
+                        <p className="text-zinc-600 font-bold uppercase tracking-widest text-[10px] sm:text-xs italic pt-4">Ref: {getReferenciaTexto()}</p>
                       </div>
 
-                      <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                        <div className="px-6 py-3 bg-black/40 rounded-xl border border-white/5 flex flex-col gap-1">
+                      <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                        <div className="px-4 py-2 bg-white/5 rounded-lg border border-white/5 flex items-center gap-3">
                           <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Ano</span>
-                          <span className="text-sm font-black text-marshall-gold italic uppercase">{config.anoReferencia}</span>
+                          <span className="text-xs font-black text-marshall-gold italic">{config.anoReferencia}</span>
                         </div>
-                        <div className="px-6 py-3 bg-black/40 rounded-xl border border-white/5 flex flex-col gap-1">
+                        <div className="px-4 py-2 bg-white/5 rounded-lg border border-white/5 flex items-center gap-3">
                           <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Pagamento</span>
-                          <span className="text-sm font-black text-marshall-gold italic uppercase">{config.dataPagamento.split('-').reverse().join('/')}</span>
+                          <span className="text-xs font-black text-marshall-gold italic uppercase">{config.dataPagamento.split('-').reverse().join('/')}</span>
                         </div>
                       </div>
 
                       {/* Lista de nomes simplificada */}
-                      <div className="pt-6 border-t border-white/5">
-                        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-4">Selecionados neste lote:</p>
+                      <div className="pt-8 border-t border-white/5">
+                        <p className="text-[9px] font-black text-zinc-700 uppercase tracking-widest mb-4">Integrantes deste lote:</p>
                         <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
                           {colaboradores.filter(c => selectedIds.includes(c.id)).slice(0, 5).map(c => (
-                            <span key={c.id} className="text-[9px] font-black text-white px-3 py-1 bg-white/5 rounded-lg border border-white/5">
+                            <span key={c.id} className="text-[9px] font-black text-white/50 px-3 py-1.5 bg-white/5 rounded-lg border border-white/5 hover:text-white transition-colors">
                               {c.nome.split(' ')[0]} {c.nome.split(' ').slice(-1)}
                             </span>
                           ))}
                           {selectedIds.length > 5 && (
-                            <span className="text-[9px] font-black text-zinc-500 px-3 py-1 border border-white/5 border-dashed rounded-lg">
+                            <span className="text-[9px] font-black text-zinc-600 px-3 py-1.5 border border-white/5 border-dashed rounded-lg italic">
                               + {selectedIds.length - 5} outros
                             </span>
                           )}
@@ -786,24 +786,25 @@ export default function GerarReciboPage() {
                       </div>
                     </div>
 
-                    <div className="w-full lg:w-auto shrink-0 space-y-4">
+                    <div className="w-full lg:w-96 shrink-0 bg-white/5 p-6 sm:p-8 rounded-[32px] border border-white/10 space-y-6">
                       <button 
                         onClick={handleGenerateBulk}
                         disabled={loading}
-                        className="w-full lg:w-80 h-24 bg-gradient-to-br from-marshall-gold to-[#b38a31] rounded-2xl flex items-center justify-center gap-4 text-white shadow-gold hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                        className="w-full h-24 bg-gradient-to-br from-marshall-gold to-[#b38a31] rounded-2xl flex items-center justify-center gap-4 text-white shadow-gold hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
                       >
                         {loading ? (
                           <Loader2 className="animate-spin" size={32} />
                         ) : (
                           <Zap size={32} className="fill-white" />
                         )}
-                        <span className="text-xl font-black tracking-tighter italic uppercase">{loading ? 'Gerando...' : 'Gerar Recibo'}</span>
+                        <span className="text-xl font-black tracking-tighter italic uppercase">{loading ? 'Gerando...' : 'Transmitir Lote'}</span>
                       </button>
                       <button 
                         onClick={() => setCurrentStep(3)}
                         disabled={loading}
-                        className="w-full text-[10px] font-black text-zinc-600 hover:text-white uppercase tracking-[4px] py-4 transition-colors"
+                        className="w-full text-[10px] font-black text-zinc-500 hover:text-marshall-gold uppercase tracking-[4px] py-2 transition-colors flex items-center justify-center gap-2"
                       >
+                        <Settings size={14} />
                         Ajustar Detalhes
                       </button>
                     </div>
