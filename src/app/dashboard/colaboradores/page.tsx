@@ -214,7 +214,6 @@ export default function ColaboradoresPage() {
               </div>
               <h1 className="text-4xl font-black tracking-tight text-white italic">Equipe Marshall</h1>
             </div>
-            <p className="text-zinc-500 font-medium">Controle de fichas Marshall Gold com chaves PIX e regras proporcionais.</p>
           </div>
           
           <button 

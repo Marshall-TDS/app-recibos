@@ -247,7 +247,7 @@ const HTML_TEMPLATE = `
             <div class="brand-section">
                 <div class="brand-name">Marshall <span>TDS</span></div>
                 <div class="employer-info">
-                    <div>Empregador: {{nome_empregador}}</div>
+                    <div>Empregador:<br> {{nome_empregador}}</div>
                     <div>{{doc_empregador}}</div>
                 </div>
             </div>
@@ -376,7 +376,8 @@ export async function generateReceiptPDF(data: any): Promise<Buffer> {
       ? `<div class="sub-value" style="color: #dbaa3d; font-weight: 700;">${data.razao_social}</div>` 
       : '';
 
-    const valorBaseRow = data.valor_base_unidade || data.valor_base || '0,00';
+    const valorBaseRow = data.valor_base || '0,00';
+    const salBaseUnidade = data.valor_base_unidade || '0,00';
     
     const placeholders: Record<string, string> = {
       nome: data.nome || 'N/A',
@@ -387,7 +388,7 @@ export async function generateReceiptPDF(data: any): Promise<Buffer> {
       nome_empregador: data.nome_empregador || 'Natan Portela da Silva',
       doc_empregador: data.doc_empregador || '444.618.778-33',
       referencia: data.referencia || 'N/A',
-      referencia_desc: "Salário Mensal",
+      referencia_desc: `Salário Mensal: R$ ${salBaseUnidade}`,
       data_pagamento: data.data || 'N/A',
       valor_base_row: valorBaseRow,
       perc_gratificacao: percGrat.toString(),

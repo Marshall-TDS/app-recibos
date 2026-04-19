@@ -106,7 +106,7 @@ export default function DashboardOverview() {
               Marshall <span className="text-marshall-gold">Recibos</span>
             </h1>
             <p className="text-zinc-500 font-medium max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
-              Bem-vindo ao ecossistema Marshall Gold. Gerencie sua equipe, automatize pagamentos e gere recibos profissionais em lote com segurança máxima.
+              Bem-vindo Marshall Recibos. Gerencie sua equipe e gere recibos em lote com segurança máxima.
             </p>
           </div>
           
