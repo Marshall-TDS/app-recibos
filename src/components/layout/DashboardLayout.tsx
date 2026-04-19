@@ -11,7 +11,9 @@ import {
   Settings,
   LayoutDashboard,
   ShieldCheck,
-  Zap
+  Zap,
+  Menu,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
@@ -154,9 +156,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
         <button 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 bg-white/5 rounded-lg text-marshall-gold"
+          className="p-2 bg-white/5 rounded-xl text-marshall-gold border border-white/10 active:scale-95 transition-all"
         >
-          {isMobileMenuOpen ? <LayoutDashboard size={20} /> : <Zap size={20} className="fill-marshall-gold" />}
+          <AnimatePresence mode="wait">
+            {isMobileMenuOpen ? (
+              <motion.div
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <X size={24} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="menu"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Menu size={24} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </button>
       </header>
 
@@ -190,7 +214,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className={`flex-1 overflow-y-auto relative grid-bg px-4 sm:px-10 selection:bg-marshall-gold/30 ${isHomolog ? 'pt-24 lg:pt-16' : 'pt-24 lg:pt-10'} pb-10`}>
+      <main className={`flex-1 overflow-y-auto overflow-x-hidden relative grid-bg px-4 sm:px-10 selection:bg-marshall-gold/30 ${isHomolog ? 'pt-24 lg:pt-16' : 'pt-24 lg:pt-10'} pb-10`}>
         {/* Dynamic ambient backdrops */}
         <div className="orb top-0 -right-20 w-[600px] h-[600px] bg-marshall-gold/5 blur-[120px]" />
         <div className="orb bottom-0 -left-20 w-[400px] h-[400px] bg-marshall-gold/10 blur-[100px]" />

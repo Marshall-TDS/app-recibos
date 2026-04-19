@@ -99,20 +99,21 @@ export default function DashboardOverview() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-700">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 animate-in fade-in duration-700">
+        <div className="flex flex-col items-center text-center gap-6 mb-16">
           <div>
-            <h1 className="text-4xl font-black text-white italic tracking-tight mb-3">
-              Marshall <span className="text-marshall-gold">Receipts</span>
+            <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tight mb-4">
+              Marshall <span className="text-marshall-gold">Recibos</span>
             </h1>
-            <p className="text-zinc-500 font-medium max-w-2xl">
-              Bem-vindo ao sistema Marshall de emissão de recibos profissionais. Gerencie sua equipe e gere documentos em lote com facilidade.
+            <p className="text-zinc-500 font-medium max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
+              Bem-vindo ao ecossistema Marshall Gold. Gerencie sua equipe, automatize pagamentos e gere recibos profissionais em lote com segurança máxima.
             </p>
           </div>
           
-          <Link href="/dashboard/gerar">
-            <button className="button-primary px-8 py-4 gap-3 text-lg italic tracking-tight shadow-gold group">
-              <PlusCircle size={24} className="group-hover:rotate-90 transition-transform duration-500" />
+          <Link href="/dashboard/gerar" className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-marshall-gold to-orange-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
+            <button className="relative button-primary px-10 py-5 gap-4 text-xl italic tracking-tight shadow-gold group">
+              <PlusCircle size={28} className="group-hover:rotate-90 transition-transform duration-500" />
               <span>Gerar Novo Lote</span>
             </button>
           </Link>
@@ -139,52 +140,22 @@ export default function DashboardOverview() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          {/* Recent Activity Card */}
-          <div className="lg:col-span-12 glass p-10 rounded-[40px] flex flex-col border-white/5">
-            <div className="flex items-center justify-between mb-10">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-marshall-gold/20 flex items-center justify-center text-marshall-gold">
-                   <Clock size={20} />
-                </div>
-                <h2 className="text-xl font-black italic uppercase tracking-tighter">Último Lote Gerado</h2>
-              </div>
-              <Link href="/dashboard/historico" className="text-xs font-black text-zinc-500 hover:text-marshall-gold uppercase tracking-widest transition-colors">
-                Ver Histórico Completo
-              </Link>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch mt-8">
+          {/* Permanent History CTA */}
+          <div className="lg:col-span-12 glass p-10 rounded-[40px] flex flex-col items-center text-center border-white/5 bg-marshall-gold/[0.02]">
+            <div className="w-16 h-16 rounded-2xl bg-marshall-gold/10 flex items-center justify-center text-marshall-gold mb-6">
+               <Clock size={32} />
             </div>
-
-            <div className="flex-1 flex flex-col justify-center min-h-[120px]">
-              {loading ? (
-                <div className="flex items-center gap-3 text-zinc-600 font-bold uppercase tracking-widest text-xs animate-pulse justify-center">
-                  <div className="w-4 h-4 rounded-full border-2 border-marshall-gold border-t-transparent animate-spin" />
-                  Sincronizando Base...
-                </div>
-              ) : stats.ultimoRecibo ? (
-                <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl flex items-center justify-between group hover:border-marshall-gold/20 transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-marshall-gold/10 flex items-center justify-center text-marshall-gold font-black">
-                      {stats.ultimoRecibo.colaboradores?.nome?.[0] || '?'}
-                    </div>
-                    <div>
-                      <p className="text-white font-black text-lg italic">{stats.ultimoRecibo.colaboradores?.nome || 'N/A'}</p>
-                      <p className="text-zinc-500 text-xs font-bold uppercase tracking-tighter">Emissão: {new Date(stats.ultimoRecibo.created_at).toLocaleDateString('pt-BR')}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-marshall-gold font-black text-2xl italic">
-                      R$ {Number(stats.ultimoRecibo.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </p>
-                    <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest">Valor Líquido</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="py-12 flex flex-col items-center justify-center text-zinc-700 italic border-2 border-dashed border-white/[0.02] rounded-3xl">
-                  <FileText size={48} className="mb-4 opacity-10" />
-                  <p className="font-bold uppercase tracking-widest text-xs">Nenhum registro encontrado</p>
-                </div>
-              )}
-            </div>
+            <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-4">Veja o Histórico Permanente</h2>
+            <p className="text-zinc-500 max-w-xl mb-8 font-medium">
+              Todos os seus recibos gerados estão armazenados de forma segura e criptografada. Acesse a base completa para consultas ou re-emissões.
+            </p>
+            <Link href="/dashboard/historico">
+              <button className="flex items-center gap-3 px-8 h-14 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl text-base font-black italic uppercase tracking-widest transition-all hover:scale-105 group">
+                Acessar Base de Dados
+                <ArrowRight size={20} className="text-marshall-gold group-hover:translate-x-1 transition-transform" />
+              </button>
+            </Link>
           </div>
         </div>
       </div>

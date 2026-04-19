@@ -61,13 +61,30 @@ export default function ConfiguracoesPage() {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error('Usuário não autenticado');
 
-      const { error } = await supabase
+      // Verifica se já existe uma configuração
+      const { data: existing } = await supabase
         .from('configuracoes')
-        .upsert({
-          user_id: userData.user.id,
-          nome_pagador: config.nome_pagador,
-          documento_pagador: config.documento_pagador,
-        }, { onConflict: 'user_id' });
+        .select('id')
+        .eq('user_id', userData.user.id)
+        .single();
+
+      const payload = {
+        user_id: userData.user.id,
+        nome_pagador: config.nome_pagador,
+        documento_pagador: config.documento_pagador,
+      };
+
+      let error;
+      if (existing?.id) {
+        ({ error } = await supabase
+          .from('configuracoes')
+          .update(payload)
+          .eq('id', existing.id));
+      } else {
+        ({ error } = await supabase
+          .from('configuracoes')
+          .insert([payload]));
+      }
 
       if (error) throw error;
       

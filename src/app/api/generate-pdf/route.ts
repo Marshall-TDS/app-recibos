@@ -1,22 +1,23 @@
 import { NextResponse } from 'next/server';
-import { spawn } from 'child_process';
-import path from 'path';
-import fs from 'fs';
 import { createClient } from '@supabase/supabase-js';
+import { generateReceiptPDF } from '@/lib/pdf-service';
 
 // Cliente Supabase interno para uso na API Route (Server Side)
+// Utilizando service_role para garantir upload no bucket privado
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(request: Request) {
   try {
     const data = await request.json();
     const { 
-      colaborador: colabPassed, // Dados passados diretamente do front para evitar RLS lag/miss
+      colaborador: colaborador,
       valor, 
       valor_base, 
+      valor_base_unidade,
       valor_gratificacao, 
+      valor_desconto,
       adicionais_lista,
       data: dataPagamento, 
       referencia, 
@@ -24,74 +25,69 @@ export async function POST(request: Request) {
       via = 'Colaborador'
     } = data;
 
-    // 1. Buscar configurações do Pagador (ainda necessário ou podemos passar também?)
-    // Vamos tentar buscar a config, se falhar usamos um default seguro
-    const { data: config } = await supabase.from('configuracoes').select('*').limit(1).single();
-
-    const colaborador = colabPassed;
-
     if (!colaborador) {
       return NextResponse.json({ success: false, error: 'Colaborador não encontrado' }, { status: 404 });
     }
 
-    // 2. Preparar diretório de saída
-    const outputDir = path.join(process.cwd(), 'public', 'generated_recibos');
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
+    // 1. Buscar configurações do Pagador caso necessário
+    const { data: config } = await supabase.from('configuracoes').select('*').limit(1).single();
 
-    // Nomenclatura solicitada: $nomeColaborador_$documento_(empresa|colaborador).pdf
-    const safeName = colaborador.nome.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    const safeDoc = (colaborador.documento || '').replace(/\D/g, '');
-    const viaSuffix = via.toLowerCase() === 'empresa' ? 'empresa' : 'colaborador';
-    const filename = `${safeName}_${safeDoc}_${viaSuffix}.pdf`;
-    const outputPath = path.join(outputDir, filename);
-
-    // 3. Formatar dados para o motor Python
-    const pythonData = {
+    // 2. Formatar dados para o motor PDF
+    const pdfData = {
+      ...data,
       nome: colaborador.nome,
-      documento: colaborador.documento || 'NÃO INFORMADO',
-      cargo: colaborador.cargo || 'Colaborador',
+      documento: colaborador.documento || 'N/A',
+      cargo: colaborador.cargo || 'N/A',
       nome_empresa: colaborador.nome_empresa || 'Marshall TDS',
       razao_social: colaborador.razao_social || '',
       nome_empregador: config?.nome_pagador || 'Natan Portela da Silva',
       doc_empregador: config?.documento_pagador || '444.618.778-33',
-      valor: valor,
-      valor_base: valor_base,
-      valor_gratificacao: valor_gratificacao,
-      adicionais_lista: adicionais_lista || [],
-      chave_pix: colaborador.chave_pix || 'Não informada',
-      via: via,
-      data_emissao: new Date(dataPagamento).toLocaleDateString('pt-BR'),
-      referencia: referencia,
-      observacoes: observacoes,
-      output_path: outputPath
+      valor,
+      valor_base,
+      valor_base_unidade,
+      valor_gratificacao,
+      valor_desconto,
+      adicionais_lista,
+      data: dataPagamento ? dataPagamento.split('-').reverse().join('/') : 'N/A',
+      referencia,
+      observacoes,
+      via,
+      data_emissao: new Date().toLocaleDateString('pt-BR'),
+      chave_pix: colaborador.chave_pix || 'Não informada'
     };
 
-    const pythonScriptPath = path.join(process.cwd(), 'generator', 'pdf_engine.py');
-    const pythonExecutablePath = path.join(process.cwd(), 'generator', 'venv', 'bin', 'python3');
+    // 3. Gerar o PDF no motor nativo (Vercel Ready)
+    const pdfBuffer = await generateReceiptPDF(pdfData);
 
-    return new Promise<Response>((resolve) => {
-      const pyProcess = spawn(pythonExecutablePath, [pythonScriptPath, JSON.stringify(pythonData)]);
+    // 4. Salvar no Supabase Storage (Bucket Privado 'recibos')
+    const safeName = colaborador.nome.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const safeDoc = (colaborador.documento || '').replace(/\D/g, '');
+    const viaSuffix = via.toLowerCase() === 'empresa' ? 'empresa' : 'colaborador';
+    const timestamp = new Date().getTime();
+    const filename = `${safeName}_${safeDoc}_${viaSuffix}_${timestamp}.pdf`;
+    
+    // Caminho no bucket: colaboradores/id_colaborador/arquivo.pdf
+    const filePath = `${colaborador.id}/${filename}`;
 
-      let output = '';
-      let errorText = '';
-
-      pyProcess.stdout.on('data', (d) => { output += d.toString(); });
-      pyProcess.stderr.on('data', (d) => { errorText += d.toString(); });
-
-      pyProcess.on('close', (code) => {
-        if (code === 0) {
-          resolve(NextResponse.json({ 
-            success: true, 
-            pdfUrl: `/generated_recibos/${filename}`,
-            filename: filename,
-            message: 'PDF gerado com sucesso.'
-          }));
-        } else {
-          resolve(NextResponse.json({ success: false, error: 'Erro no processamento do PDF' }, { status: 500 }));
-        }
+    const { error: uploadError } = await supabase.storage
+      .from('recibos')
+      .upload(filePath, pdfBuffer, {
+        contentType: 'application/pdf',
+        cacheControl: '3600',
+        upsert: false
       });
+
+    if (uploadError) {
+      console.error('FULL UPLOAD ERROR:', uploadError);
+      throw new Error(`Falha no armazenamento: ${uploadError.message}`);
+    }
+
+    // 5. Retornar o caminho do arquivo para o frontend salvar no banco
+    return NextResponse.json({ 
+      success: true, 
+      pdfUrl: filePath, // Retornamos o path do bucket
+      filename: filename,
+      message: 'PDF gerado e armazenado com sucesso.'
     });
 
   } catch (err: any) {

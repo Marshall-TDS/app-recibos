@@ -358,16 +358,18 @@ export default function ColaboradoresPage() {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <div className="flex p-0.5 bg-black/40 rounded-lg w-fit border border-white/5">
+                    <div className="flex p-1 bg-black/40 rounded-xl w-full sm:w-auto border border-white/5 justify-center">
                       <button 
+                        type="button"
                         onClick={() => setActiveTab('geral')}
-                        className={`px-4 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === 'geral' ? 'bg-marshall-gold text-white shadow-gold' : 'text-zinc-500 hover:text-white'}`}
+                        className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'geral' ? 'bg-marshall-gold text-white shadow-gold' : 'text-zinc-500 hover:text-white'}`}
                       >
                         IDENTIFICAÇÃO
                       </button>
                       <button 
+                        type="button"
                         onClick={() => setActiveTab('financeiro')}
-                        className={`px-4 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === 'financeiro' ? 'bg-marshall-gold text-white shadow-gold' : 'text-zinc-500 hover:text-white'}`}
+                        className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'financeiro' ? 'bg-marshall-gold text-white shadow-gold' : 'text-zinc-500 hover:text-white'}`}
                       >
                         FINANCEIRO
                       </button>
@@ -473,14 +475,20 @@ export default function ColaboradoresPage() {
                             <DollarSign size={12} className="text-marshall-gold" />
                             Remuneração Base
                           </label>
-                          <input 
-                            type="number" 
-                            step="0.01" 
-                            value={form.salario_base}
-                            onChange={(e) => setForm({...form, salario_base: e.target.value})}
-                            required
-                            className="!h-11"
-                          />
+                          <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-marshall-gold font-black text-sm">R$</span>
+                            <input 
+                              type="text" 
+                              value={(Number(form.salario_base) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/\D/g, '');
+                                const floatVal = parseFloat(val) / 100 || 0;
+                                setForm({...form, salario_base: floatVal.toString()});
+                              }}
+                              required
+                              className="!h-12 pl-12 font-black text-lg text-white"
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -529,33 +537,37 @@ export default function ColaboradoresPage() {
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
                               key={idx} 
-                              className="flex gap-4 items-center p-6 bg-white/[0.03] rounded-3xl border border-white/5 group/item hover:bg-white/[0.05] transition-all"
+                              className="flex flex-col sm:flex-row gap-4 sm:items-center p-5 sm:p-6 bg-white/[0.03] rounded-3xl border border-white/5 group/item hover:bg-white/[0.05] transition-all relative"
                             >
                               <div className="flex-1">
-                                <label className="text-[9px] font-black text-zinc-600 uppercase mb-2 block">Descrição do Lançamento</label>
+                                <label className="text-[9px] font-black text-zinc-600 uppercase mb-1 block">Descrição</label>
                                 <input 
                                   placeholder="Ex: Convênio Médico"
                                   value={add.descricao}
                                   onChange={(e) => updateAdicional(idx, 'descricao', e.target.value)}
-                                  className="!h-8 border-none !bg-transparent p-0 text-white font-black italic focus:ring-0 placeholder:text-zinc-700"
+                                  className="!h-8 border-none !bg-transparent p-0 text-white font-black italic focus:ring-0 placeholder:text-zinc-700 w-full"
                                 />
                               </div>
-                              <div className="w-36 px-4 border-l border-white/5">
-                                <label className="text-[9px] font-black text-zinc-600 uppercase mb-2 block text-right">Valor Mensal</label>
-                                <div className="flex items-center justify-end gap-1">
+                              <div className="w-full sm:w-36 sm:px-4 sm:border-l border-white/5">
+                                <label className="text-[9px] font-black text-zinc-600 uppercase mb-1 block text-left sm:text-right">Valor Mensal</label>
+                                <div className="flex items-center justify-start sm:justify-end gap-1">
                                   <span className="text-[10px] font-bold text-marshall-gold/50">R$</span>
                                   <input 
-                                    type="number"
-                                    value={add.valor_mensal || ''}
-                                    onChange={(e) => updateAdicional(idx, 'valor_mensal', e.target.value)}
-                                    className="!h-8 border-none !bg-transparent p-0 text-right font-black text-marshall-gold focus:ring-0 w-24"
+                                    type="text"
+                                    value={(add.valor_mensal || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                    onChange={(e) => {
+                                      const val = e.target.value.replace(/\D/g, '');
+                                      const floatVal = parseFloat(val) / 100 || 0;
+                                      updateAdicional(idx, 'valor_mensal', floatVal);
+                                    }}
+                                    className="!h-8 border-none !bg-transparent p-0 text-left sm:text-right font-black text-marshall-gold focus:ring-0 w-full"
                                   />
                                 </div>
                               </div>
                               <button 
                                 type="button"
                                 onClick={() => removeAdicional(idx)}
-                                className="p-3 bg-red-500/10 text-red-500/50 hover:text-red-500 hover:bg-red-500/20 rounded-lg transition-all"
+                                className="absolute top-4 right-4 sm:relative sm:top-0 sm:right-0 p-3 bg-red-500/10 text-red-500/50 hover:text-red-500 hover:bg-red-500/20 rounded-xl transition-all"
                               >
                                 <Trash2 size={18} />
                               </button>
