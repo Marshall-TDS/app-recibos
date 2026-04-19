@@ -344,10 +344,21 @@ export async function generateReceiptPDF(data: any): Promise<Buffer> {
   
   let browser;
   if (isProd) {
+    const executablePath = await fullChromium.executablePath();
+    
+    // Injeção de path de bibliotecas para Vercel Node 20/22
+    // Isso ajuda o sistema a encontrar libnss3.so e outras dependências embutidas
+    process.env.LD_LIBRARY_PATH = `${process.env.LD_LIBRARY_PATH || ''}:/var/task/node_modules/@sparticuz/chromium/lib`;
+
     browser = await puppeteer.launch({
-      args: fullChromium.args,
+      args: [
+        ...fullChromium.args,
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--no-zygote',
+      ],
       defaultViewport: fullChromium.defaultViewport,
-      executablePath: await fullChromium.executablePath(),
+      executablePath,
       headless: fullChromium.headless,
     });
   } else {
