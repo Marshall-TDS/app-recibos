@@ -797,7 +797,7 @@ export default function GerarReciboPage() {
                         ) : (
                           <Zap size={32} className="fill-white" />
                         )}
-                        <span className="text-xl font-black tracking-tighter italic uppercase">{loading ? 'Gerando...' : 'Transmitir Lote'}</span>
+                        <span className="text-xl font-black tracking-tighter italic uppercase">{loading ? 'Gerando...' : 'Gerar Recibos'}</span>
                       </button>
                       <button 
                         onClick={() => setCurrentStep(3)}
