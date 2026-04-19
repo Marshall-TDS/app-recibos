@@ -1,5 +1,5 @@
 import { chromium } from 'playwright-core';
-import chromiumMin from '@sparticuz/chromium-min';
+import fullChromium from '@sparticuz/chromium';
 
 const HTML_TEMPLATE = `
 <!DOCTYPE html>
@@ -345,9 +345,9 @@ export async function generateReceiptPDF(data: any): Promise<Buffer> {
   let browser;
   if (isProd) {
     browser = await chromium.launch({
-      args: chromiumMin.args,
-      executablePath: await chromiumMin.executablePath(),
-      headless: true,
+      args: fullChromium.args,
+      executablePath: await fullChromium.executablePath(),
+      headless: typeof fullChromium.headless === 'boolean' ? fullChromium.headless : true,
     });
   } else {
     browser = await chromium.launch({ headless: true });
