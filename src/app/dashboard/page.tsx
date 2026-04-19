@@ -13,10 +13,11 @@ import {
   DollarSign
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 
 export default function DashboardOverview() {
+  const supabase = createClient();
   const [stats, setStats] = useState({
     totalColaboradores: 0,
     totalRecibos: 0,

@@ -16,7 +16,7 @@ import {
   X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Resumo', href: '/dashboard' },
@@ -27,6 +27,7 @@ const menuItems = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const supabase = createClient();
   const [isMaster, setIsMaster] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

@@ -22,7 +22,7 @@ import {
   CheckSquare
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
@@ -43,6 +43,7 @@ interface Recibo {
 }
 
 export default function HistoricoPage() {
+  const supabase = createClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [history, setHistory] = useState<Recibo[]>([]);
   const [loading, setLoading] = useState(true);

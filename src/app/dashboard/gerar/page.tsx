@@ -24,7 +24,7 @@ import {
   Minus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
@@ -51,6 +51,7 @@ const MESES_OPCOES = [
 ];
 
 export default function GerarReciboPage() {
+  const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [batchProgress, setBatchProgress] = useState({ current: 0, total: 0, status: '' });
   const [batchResults, setBatchResults] = useState<{ success: string[], failed: { name: string, error: string }[] } | null>(null);

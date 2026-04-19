@@ -1,4 +1,4 @@
-import { chromium } from 'playwright-core';
+import puppeteer from 'puppeteer-core';
 import fullChromium from '@sparticuz/chromium';
 
 const HTML_TEMPLATE = `
@@ -344,13 +344,20 @@ export async function generateReceiptPDF(data: any): Promise<Buffer> {
   
   let browser;
   if (isProd) {
-    browser = await chromium.launch({
+    browser = await puppeteer.launch({
       args: fullChromium.args,
+      defaultViewport: fullChromium.defaultViewport,
       executablePath: await fullChromium.executablePath(),
-      headless: typeof fullChromium.headless === 'boolean' ? fullChromium.headless : true,
+      headless: fullChromium.headless,
     });
   } else {
-    browser = await chromium.launch({ headless: true });
+    // Local: No Mac, o puppeteer-core precisa saber onde está o Chrome
+    // Tentamos o caminho padrão do Chrome no macOS
+    browser = await puppeteer.launch({ 
+      headless: true,
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
   }
 
   try {
@@ -405,8 +412,9 @@ export async function generateReceiptPDF(data: any): Promise<Buffer> {
       populatedHtml = populatedHtml.replace(new RegExp(`{{${key}}}`, 'g'), placeholders[key]);
     });
 
-    await page.setContent(populatedHtml);
-    await page.waitForLoadState('networkidle');
+    await page.setContent(populatedHtml, { 
+      waitUntil: 'networkidle0' 
+    });
     
     const pdfBuffer = await page.pdf({
       format: 'A4',
@@ -414,8 +422,8 @@ export async function generateReceiptPDF(data: any): Promise<Buffer> {
       margin: { top: '0', right: '0', bottom: '0', left: '0' }
     });
 
-    return pdfBuffer;
+    return Buffer.from(pdfBuffer);
   } finally {
-    await browser.close();
+    if (browser) await browser.close();
   }
 }

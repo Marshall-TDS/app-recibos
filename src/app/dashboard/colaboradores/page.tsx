@@ -22,7 +22,7 @@ import {
   Wallet
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { maskCPF, maskCNPJ, applyPIXMask } from '@/lib/masks';
 
 interface Adicional {
@@ -50,6 +50,7 @@ const PIX_TYPES = ['CPF', 'CNPJ', 'TELEFONE', 'EMAIL', 'ALEATORIA'];
 const ADICIONAIS_SUGESTOES = ['Convênio Médico', 'Vale Alimentação', 'Bônus Performance', 'Auxílio Home Office'];
 
 export default function ColaboradoresPage() {
+  const supabase = createClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
   const [loading, setLoading] = useState(true);

@@ -13,10 +13,11 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { maskCNPJ, maskCPF } from '@/lib/masks';
 
 export default function ConfiguracoesPage() {
+  const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
