@@ -214,27 +214,32 @@ export default function GerarReciboPage() {
     }));
   };
 
-  const getReferenciaTexto = () => {
+  const getReferenciaTexto = (diasFevereiro?: number) => {
     if (config.mesesSelecionados.length === 0) return '';
     
     // Lista ordenada de meses para garantir lógica consistente
     const mesesOrdenados = [...config.mesesSelecionados].sort((a, b) => 
       MESES_OPCOES.indexOf(a) - MESES_OPCOES.indexOf(b)
     );
-
+  
+    const multianual = mesesOrdenados.length > 8;
     const spansEarlyYear = mesesOrdenados.some(m => ['Janeiro', 'Fevereiro', 'Março'].includes(m));
     
     return mesesOrdenados.map(mes => {
       let texto = `${mes}/${config.anoReferencia}`;
       
       // Se tiver meses do final do ano e meses do início do ano, os do final são do ano anterior
-      if (['Outubro', 'Novembro', 'Dezembro'].includes(mes) && spansEarlyYear) {
+      // PORÉM: Só fazemos isso se não for um lote de "ano completo" (muitos meses selecionados)
+      if (['Outubro', 'Novembro', 'Dezembro'].includes(mes) && spansEarlyYear && !multianual) {
         texto = `${mes}/${config.anoReferencia - 1}`;
       }
       
-      // Regra Marshall: Fevereiro é até dia 20
+      // Regra Marshall: Fevereiro é customizado pelo cadastro (padrão 20 se não for completo)
       if (mes === 'Fevereiro') {
-        texto += ' (Até 20/02)';
+        const dias = diasFevereiro !== undefined ? diasFevereiro : 20;
+        if (dias < 30) {
+          texto += ` (Até ${dias}/02)`;
+        }
       }
       
       return texto;
@@ -339,7 +344,7 @@ export default function GerarReciboPage() {
               descricao: a.descricao,
               valor: (a.valor_mensal * config.mesesSelecionados.length).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
             })) || [],
-            referencia: getReferenciaTexto(),
+            referencia: getReferenciaTexto(colab.dias_fevereiro),
             data: config.dataPagamento,
             observacoes: config.observacoes,
           };
@@ -602,7 +607,7 @@ export default function GerarReciboPage() {
                     >
                       <p className="text-[10px] font-black text-marshall-gold/50 uppercase tracking-widest mb-1">Preview da Referência</p>
                       <p className="text-lg font-black text-marshall-gold italic uppercase tracking-tight">
-                        {getReferenciaTexto()}
+                        {getReferenciaTexto(selectedIds.length === 1 ? colaboradores.find(c => c.id === selectedIds[0])?.dias_fevereiro : undefined)}
                       </p>
                     </motion.div>
                   )}
