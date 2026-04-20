@@ -84,6 +84,11 @@ export default function GerarReciboPage() {
     fetchHistorico();
   }, []);
 
+  // Rolar para o topo ao mudar de etapa
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
+
   const fetchHistorico = async (dateFilter?: string) => {
     try {
       setHistoricoLoading(true);
@@ -217,24 +222,29 @@ export default function GerarReciboPage() {
   const getReferenciaTexto = (diasFevereiro?: number) => {
     if (config.mesesSelecionados.length === 0) return '';
     
-    // Lista ordenada de meses para garantir lógica consistente
-    const mesesOrdenados = [...config.mesesSelecionados].sort((a, b) => 
-      MESES_OPCOES.indexOf(a) - MESES_OPCOES.indexOf(b)
-    );
-  
-    const multianual = mesesOrdenados.length > 8;
-    const spansEarlyYear = mesesOrdenados.some(m => ['Janeiro', 'Fevereiro', 'Março'].includes(m));
-    
-    return mesesOrdenados.map(mes => {
-      let texto = `${mes}/${config.anoReferencia}`;
-      
-      // Se tiver meses do final do ano e meses do início do ano, os do final são do ano anterior
-      // PORÉM: Só fazemos isso se não for um lote de "ano completo" (muitos meses selecionados)
+    const multianual = config.mesesSelecionados.length > 8;
+    const spansEarlyYear = config.mesesSelecionados.some(m => ['Janeiro', 'Fevereiro', 'Março'].includes(m));
+
+    // Mapeamos cada mês para um objeto com ano calculado para sustentar ordenação
+    const mesesComAno = config.mesesSelecionados.map(mes => {
+      let ano = config.anoReferencia;
+      // Se não for lote anual e cruza o ano, meses do final do ano são do ano anterior
       if (['Outubro', 'Novembro', 'Dezembro'].includes(mes) && spansEarlyYear && !multianual) {
-        texto = `${mes}/${config.anoReferencia - 1}`;
+        ano = config.anoReferencia - 1;
       }
+      return { mes, ano, index: MESES_OPCOES.indexOf(mes) };
+    });
+
+    // Ordenação Cronológica Real: Primeiro por Ano, depois por Índice do Mês
+    mesesComAno.sort((a, b) => {
+      if (a.ano !== b.ano) return a.ano - b.ano;
+      return a.index - b.index;
+    });
+
+    return mesesComAno.map(({ mes, ano }) => {
+      let texto = `${mes}/${ano}`;
       
-      // Regra Marshall: Fevereiro é customizado pelo cadastro (padrão 20 se não for completo)
+      // Regra Marshall: Fevereiro é customizado pelo cadastro
       if (mes === 'Fevereiro') {
         const dias = diasFevereiro !== undefined ? diasFevereiro : 20;
         if (dias < 30) {

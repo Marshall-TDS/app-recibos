@@ -66,7 +66,13 @@ const HTML_TEMPLATE = `
             letter-spacing: 0.1em;
         }
         
-        .receipt-type { text-align: right; }
+        .receipt-type { 
+            text-align: right;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
         
         .receipt-type h1 {
             font-size: 12px;
@@ -79,13 +85,16 @@ const HTML_TEMPLATE = `
         
         .ref-tag {
             display: inline-block;
-            padding: 6px 16px;
+            padding: 8px 16px;
             background: rgba(219, 170, 61, 0.1);
             color: #dbaa3d;
             font-size: 11px;
             font-weight: 800;
-            border-radius: 4px;
+            border-radius: 6px;
             border: 1px solid rgba(219, 170, 61, 0.3);
+            line-height: 1.5;
+            text-align: right;
+            word-break: break-word;
         }
 
         .payment-date {
@@ -318,14 +327,7 @@ const HTML_TEMPLATE = `
 
         <footer class="footer">
             <div class="footer-signatures">
-                <div class="sig-box">
-                    <div class="sig-line"></div>
-                    <div class="sig-text">{{nome}}</div>
-                </div>
-                <div class="sig-box">
-                    <div class="sig-line"></div>
-                    <div class="sig-text">{{nome_empregador}}</div>
-                </div>
+                {{assinaturas}}
             </div>
             <div class="stamp">Marshall TDS • Gerado em {{data_emissao}}</div>
         </footer>
@@ -397,7 +399,13 @@ export async function generateReceiptPDF(data: any): Promise<Buffer> {
     const valorBaseRow = data.valor_base || '0,00';
     const salBaseUnidade = data.valor_base_unidade || '0,00';
     
+    const assinaturasHtml = data.via === 'Empresa' 
+      ? `<div class="sig-box"><div class="sig-line"></div><div class="sig-text">${data.nome_empregador || 'Natan Portela da Silva'}</div></div>`
+      : `<div class="sig-box"><div class="sig-line"></div><div class="sig-text">${data.nome || 'N/A'}</div></div>
+         <div class="sig-box"><div class="sig-line"></div><div class="sig-text">${data.nome_empregador || 'Natan Portela da Silva'}</div></div>`;
+
     const placeholders: Record<string, string> = {
+      assinaturas: assinaturasHtml,
       nome: data.nome || 'N/A',
       razao_social_html: razaoSocialHtml,
       documento: data.documento || 'N/A',
